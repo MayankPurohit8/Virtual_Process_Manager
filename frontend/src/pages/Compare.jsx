@@ -36,9 +36,8 @@ const Compare = () => {
     priority: "",
   });
 
-  const [results, setResults] = useState([]); // comparison output
+  const [results, setResults] = useState([]);
 
-  /* ---------- helpers ---------- */
   const addProcess = () => {
     if (!newProcess.pid || !newProcess.arrival || !newProcess.burst) return;
     setProcesses((prev) => [...prev, { ...newProcess }]);
@@ -54,7 +53,7 @@ const Compare = () => {
     const n = stats.length;
     const aw = stats.reduce((s, p) => s + p.waitingTime, 0) / n;
     const at = stats.reduce((s, p) => s + p.turnaroundTime, 0) / n;
-    const tp = n / stats[stats.length - 1].completionTime; // jobs per time‑unit
+    const tp = n / stats[stats.length - 1].completionTime;
     return { avgWaiting: aw, avgTurnaround: at, throughput: tp.toFixed(2) };
   };
 
@@ -67,7 +66,6 @@ const Compare = () => {
     setResults(output);
   };
 
-  /* ---------- render ---------- */
   const algoOptions = Object.keys(algoMap);
 
   return (
@@ -77,7 +75,6 @@ const Compare = () => {
           Compare Algorithms
         </h2>
 
-        {/* -------- process input -------- */}
         <div className="grid sm:grid-cols-5 gap-4 items-end mb-6">
           {["PID", "Arrival Time", "Burst Time", "Priority"].map((ph, idx) => (
             <input
@@ -127,7 +124,6 @@ const Compare = () => {
           </div>
         )}
 
-        {/* -------- algorithm checkboxes -------- */}
         <div className="mb-6">
           <label className="block mb-2 font-semibold text-gray-700">
             Select Algorithms to Compare:
@@ -146,7 +142,6 @@ const Compare = () => {
           </div>
         </div>
 
-        {/* -------- compare button -------- */}
         <button
           onClick={compare}
           className="bg-green-500 hover:bg-green-600 text-white font-semibold px-6 py-2 rounded-xl"
@@ -154,10 +149,8 @@ const Compare = () => {
           Compare Algorithms
         </button>
 
-        {/* -------- results -------- */}
         {results.length > 0 && (
           <div className="mt-10 space-y-8">
-            {/* table */}
             <table className="w-full text-left border border-gray-300 rounded-xl">
               <thead className="bg-gray-200">
                 <tr className="[&>*]:p-2">
@@ -179,7 +172,6 @@ const Compare = () => {
               </tbody>
             </table>
 
-            {/* bar‑chart */}
             <BarChart width={600} height={300} data={results}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="algorithm" />

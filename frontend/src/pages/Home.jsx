@@ -36,7 +36,7 @@ const Home = () => {
       </div>
 
       <footer className="mt-10 text-gray-600 text-sm">
-        Made with ❤️ using React & Tailwind CSS
+        Made by Mayank Purohit
       </footer>
     </div>
   );

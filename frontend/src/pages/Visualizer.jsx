@@ -73,7 +73,6 @@ const Visualizer = () => {
           Process Scheduling Visualizer
         </h2>
 
-        {/* Process Input Section */}
         <div className="grid sm:grid-cols-5 gap-4 items-end mb-6">
           <input
             type="text"
@@ -119,7 +118,6 @@ const Visualizer = () => {
           </button>
         </div>
 
-        {/* Process List */}
         {processes.length > 0 && (
           <div className="mb-6">
             <h4 className="text-xl font-semibold mb-2">Process List</h4>
@@ -146,7 +144,6 @@ const Visualizer = () => {
           </div>
         )}
 
-        {/* Algorithm Selection */}
         <div className="mb-6">
           <label className="block mb-2 font-medium">
             Select Scheduling Algorithm:
@@ -179,7 +176,6 @@ const Visualizer = () => {
           ) : null}
         </div>
 
-        {/* Simulate Button */}
         <button
           onClick={simulate}
           className="bg-green-500 hover:bg-green-600 text-white font-semibold px-6 py-2 rounded-xl"
@@ -187,7 +183,6 @@ const Visualizer = () => {
           Simulate
         </button>
 
-        {/* Placeholder for Gantt Chart and Stats */}
         <div className="mt-10">
           <h4 className="text-xl font-bold mb-4">Simulation Output</h4>
           <div className="space-y-6">
@@ -197,7 +192,7 @@ const Visualizer = () => {
                   ganttData={simulationResult.ganttChart}
                   algorithm={algorithm}
                 />
-                {/*Visualization Logic*/}
+
                 {simulationResult != null && (
                   <table className="w-full text-left border border-gray-300 rounded-xl">
                     <thead className="bg-gray-200">

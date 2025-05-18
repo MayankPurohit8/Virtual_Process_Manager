@@ -1,4 +1,3 @@
-// src/components/NavBar.jsx
 import { NavLink } from "react-router-dom";
 
 const navItem =
@@ -11,10 +10,12 @@ const NavBar = () => (
   <nav className="w-full bg-white dark:bg-gray-900 shadow-md">
     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
       <div className="flex items-center justify-between h-16">
-        {/* Brand / Logo */}
-        <NavLink to="/" className="text-2xl font-bold text-blue-600">
-          Virtual Process Manager
-        </NavLink>
+        <div className="flex gap-3 items-center">
+          <img src="icon.png" className="h-10 w-10" />
+          <NavLink to="/" className="text-2xl font-bold text-blue-600">
+            Virtual Process Manager
+          </NavLink>
+        </div>
 
         {/* Links */}
         <div className="flex gap-2">

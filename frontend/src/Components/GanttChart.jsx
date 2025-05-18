@@ -22,7 +22,7 @@ const GanttChart = ({ ganttData, algorithm }) => {
         {ganttData.map((item, index) => (
           <span key={index}>{item.start}</span>
         ))}
-        {/* Add last end time */}
+
         <span>{ganttData[ganttData.length - 1]?.end}</span>
       </div>
     </div>
