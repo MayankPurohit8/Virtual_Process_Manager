@@ -1,4 +1,30 @@
 import { useState } from "react";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+} from "recharts";
+import fcfs from "../algorithms/fcfs";
+import sjf from "../algorithms/sjf";
+import srtf from "../algorithms/srtf";
+import rr from "../algorithms/rr";
+import priorityPreemptive from "../algorithms/ps";
+import mlfq from "../algorithms/multilevel‑feedback‑queue";
+import mlq from "../algorithms/multilevel-queue";
+
+const algoMap = {
+  FCFS: fcfs,
+  SJF: sjf,
+  SRTF: srtf,
+  RR: rr,
+  Priority: priorityPreemptive,
+  MLQ: mlq,
+  MLFQ: mlfq,
+};
 
 const Compare = () => {
   const [algorithms, setAlgorithms] = useState(["FCFS", "SJF"]);
@@ -10,32 +36,39 @@ const Compare = () => {
     priority: "",
   });
 
+  const [results, setResults] = useState([]); // comparison output
+
+  /* ---------- helpers ---------- */
   const addProcess = () => {
     if (!newProcess.pid || !newProcess.arrival || !newProcess.burst) return;
-    setProcesses([...processes, { ...newProcess }]);
+    setProcesses((prev) => [...prev, { ...newProcess }]);
     setNewProcess({ pid: "", arrival: "", burst: "", priority: "" });
   };
 
-  const handleAlgorithmToggle = (algo) => {
+  const toggleAlgo = (algo) =>
     setAlgorithms((prev) =>
       prev.includes(algo) ? prev.filter((a) => a !== algo) : [...prev, algo]
     );
+
+  const calcAverages = (stats) => {
+    const n = stats.length;
+    const aw = stats.reduce((s, p) => s + p.waitingTime, 0) / n;
+    const at = stats.reduce((s, p) => s + p.turnaroundTime, 0) / n;
+    const tp = n / stats[stats.length - 1].completionTime; // jobs per time‑unit
+    return { avgWaiting: aw, avgTurnaround: at, throughput: tp.toFixed(2) };
   };
 
   const compare = () => {
-    // Placeholder for actual algorithm comparison
-    console.log("Comparing", algorithms, "on", processes);
+    const output = algorithms.map((algo) => {
+      const sim = algoMap[algo](processes);
+      const avg = calcAverages(sim.stats);
+      return { algorithm: algo, ...avg };
+    });
+    setResults(output);
   };
 
-  const algorithmOptions = [
-    "FCFS",
-    "SJF",
-    "SRTF",
-    "RR",
-    "Priority",
-    "MLQ",
-    "MLFQ",
-  ];
+  /* ---------- render ---------- */
+  const algoOptions = Object.keys(algoMap);
 
   return (
     <div className="min-h-screen bg-gray-100 p-6">
@@ -44,44 +77,23 @@ const Compare = () => {
           Compare Algorithms
         </h2>
 
-        {/* Process Input */}
+        {/* -------- process input -------- */}
         <div className="grid sm:grid-cols-5 gap-4 items-end mb-6">
-          <input
-            type="text"
-            placeholder="PID"
-            value={newProcess.pid}
-            onChange={(e) =>
-              setNewProcess({ ...newProcess, pid: e.target.value })
-            }
-            className="p-2 border rounded-xl"
-          />
-          <input
-            type="number"
-            placeholder="Arrival Time"
-            value={newProcess.arrival}
-            onChange={(e) =>
-              setNewProcess({ ...newProcess, arrival: e.target.value })
-            }
-            className="p-2 border rounded-xl"
-          />
-          <input
-            type="number"
-            placeholder="Burst Time"
-            value={newProcess.burst}
-            onChange={(e) =>
-              setNewProcess({ ...newProcess, burst: e.target.value })
-            }
-            className="p-2 border rounded-xl"
-          />
-          <input
-            type="number"
-            placeholder="Priority (Optional)"
-            value={newProcess.priority}
-            onChange={(e) =>
-              setNewProcess({ ...newProcess, priority: e.target.value })
-            }
-            className="p-2 border rounded-xl"
-          />
+          {["PID", "Arrival Time", "Burst Time", "Priority"].map((ph, idx) => (
+            <input
+              key={ph}
+              type={idx ? "number" : "text"}
+              placeholder={ph}
+              value={Object.values(newProcess)[idx]}
+              onChange={(e) =>
+                setNewProcess({
+                  ...newProcess,
+                  [Object.keys(newProcess)[idx]]: e.target.value,
+                })
+              }
+              className="p-2 border rounded-xl"
+            />
+          ))}
           <button
             onClick={addProcess}
             className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 rounded-xl"
@@ -89,19 +101,44 @@ const Compare = () => {
             Add Process
           </button>
         </div>
+        {processes.length > 0 && (
+          <div className="mb-6">
+            <h4 className="text-xl font-semibold mb-2">Process List</h4>
+            <table className="w-full text-left border border-gray-300 rounded-xl">
+              <thead className="bg-gray-200">
+                <tr>
+                  <th className="p-2">PID</th>
+                  <th className="p-2">Arrival</th>
+                  <th className="p-2">Burst</th>
+                  <th className="p-2">Priority</th>
+                </tr>
+              </thead>
+              <tbody>
+                {processes.map((proc, idx) => (
+                  <tr key={idx} className="border-t">
+                    <td className="p-2">{proc.pid}</td>
+                    <td className="p-2">{proc.arrival}</td>
+                    <td className="p-2">{proc.burst}</td>
+                    <td className="p-2">{proc.priority || "-"}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
 
-        {/* Algorithm Selection */}
+        {/* -------- algorithm checkboxes -------- */}
         <div className="mb-6">
           <label className="block mb-2 font-semibold text-gray-700">
             Select Algorithms to Compare:
           </label>
           <div className="grid sm:grid-cols-3 gap-3">
-            {algorithmOptions.map((algo) => (
+            {algoOptions.map((algo) => (
               <label key={algo} className="flex items-center space-x-2">
                 <input
                   type="checkbox"
                   checked={algorithms.includes(algo)}
-                  onChange={() => handleAlgorithmToggle(algo)}
+                  onChange={() => toggleAlgo(algo)}
                 />
                 <span>{algo}</span>
               </label>
@@ -109,7 +146,7 @@ const Compare = () => {
           </div>
         </div>
 
-        {/* Compare Button */}
+        {/* -------- compare button -------- */}
         <button
           onClick={compare}
           className="bg-green-500 hover:bg-green-600 text-white font-semibold px-6 py-2 rounded-xl"
@@ -117,13 +154,43 @@ const Compare = () => {
           Compare Algorithms
         </button>
 
-        {/* Placeholder for Comparison Output */}
-        <div className="mt-10">
-          <h4 className="text-xl font-bold mb-4">Comparison Result</h4>
-          <div className="bg-gray-50 p-4 rounded-xl border border-dashed border-gray-300 text-gray-500">
-            Comparison charts and metrics will appear here.
+        {/* -------- results -------- */}
+        {results.length > 0 && (
+          <div className="mt-10 space-y-8">
+            {/* table */}
+            <table className="w-full text-left border border-gray-300 rounded-xl">
+              <thead className="bg-gray-200">
+                <tr className="[&>*]:p-2">
+                  <th>Algorithm</th>
+                  <th>Avg Waiting</th>
+                  <th>Avg Turn‑around</th>
+                  <th>Throughput</th>
+                </tr>
+              </thead>
+              <tbody>
+                {results.map((r) => (
+                  <tr key={r.algorithm} className="[&>*]:p-2 border-t">
+                    <td>{r.algorithm}</td>
+                    <td>{r.avgWaiting.toFixed(2)}</td>
+                    <td>{r.avgTurnaround.toFixed(2)}</td>
+                    <td>{r.throughput}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+
+            {/* bar‑chart */}
+            <BarChart width={600} height={300} data={results}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="algorithm" />
+              <YAxis />
+              <Tooltip />
+              <Legend />
+              <Bar dataKey="avgWaiting" name="Avg WT" />
+              <Bar dataKey="avgTurnaround" name="Avg TAT" />
+            </BarChart>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );

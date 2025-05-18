@@ -1,12 +1,13 @@
 import { useState } from "react";
 import GanttChart from "../Components/GanttChart";
 
-import ComparisonChart from "../Components/ComparisonChart";
 import fcfs from "../algorithms/fcfs";
 import sjf from "../algorithms/sjf";
 import srtf from "../algorithms/srtf";
 import rr from "../algorithms/rr";
 import priorityPreemptive from "../algorithms/ps";
+import mlfq from "../algorithms/multilevel‑feedback‑queue";
+import mlq from "../algorithms/multilevel-queue";
 const Visualizer = () => {
   const [processes, setProcesses] = useState([]);
   const [algorithm, setAlgorithm] = useState("FCFS");
@@ -50,6 +51,13 @@ const Visualizer = () => {
       case "Priority":
         result = priorityPreemptive(processes);
         break;
+      case "MLQ":
+        result = mlq(processes);
+        break;
+      case "MLFQ":
+        result = mlfq(processes);
+        break;
+
       default:
         alert("Algorithm not implemented yet!");
         return;
@@ -157,6 +165,9 @@ const Visualizer = () => {
             <option value="Priority">Priority Scheduling</option>
             <option value="MLQ">Multilevel Queue</option>
             <option value="MLFQ">Multilevel Feedback Queue</option>
+            <option value="CFS">Completely Fair (CFS)</option>
+            <option value="Lottery">Lottery</option>
+            <option value="EDF">Earliest‑Deadline‑First</option>
           </select>
           {algorithm === "RR" ? (
             <input
